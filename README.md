@@ -3,6 +3,10 @@ This is an IDA Plugin powered by Python that sets a disabled breakpoint on speci
 
 ![](docs/media/CBS-Plugin.png)
 
+# Installation
+
+Just copy the python script into `$ida_path/plugins/` and restart your IDA.
+
 
 # DEMO
 
