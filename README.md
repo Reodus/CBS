@@ -1,5 +1,5 @@
 # Custom Breakpoint Setter
-This is an IDA Plugin powered by python that sets a disabled breakpoint on specific instruction's menemonic.
+This is an IDA Plugin powered by Python that sets a disabled breakpoint on specific instruction's mnemonic.
 
 ![](docs/media/CBS-Plugin.png)
 
