@@ -1,4 +1,5 @@
 import idaapi, idautils, idc
+import re
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 default_instructions = [
@@ -32,7 +33,7 @@ class CustomBreakPointPlugin(idaapi.PluginForm):
         # Create input field for new instruction
         input_layout = QtWidgets.QHBoxLayout()
         self.instruction_input = QtWidgets.QLineEdit()
-        self.instruction_input.setPlaceholderText("Enter new instruction")
+        self.instruction_input.setPlaceholderText("Enter new instruction (Regex supported)")
         self.instruction_input.returnPressed.connect(self.add_instruction)  # Add instruction on Enter key press
 
         # Create combobox for enable/disable/remove options
@@ -56,9 +57,6 @@ class CustomBreakPointPlugin(idaapi.PluginForm):
         # Add keyboard shortcuts
         self.add_instruction_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Return"), self.parent)
         self.add_instruction_shortcut.activated.connect(self.add_instruction)
-
-        # self.add_instruction_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Enter"), self.parent)
-        # self.add_instruction_shortcut.activated.connect(self.add_instruction)
 
         self.delete_instruction_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Delete"), self.parent)
         self.delete_instruction_shortcut.activated.connect(self.delete_instruction)
@@ -94,7 +92,7 @@ class CustomBreakPointPlugin(idaapi.PluginForm):
         for row in range(self.table.rowCount()):
             item = self.table.item(row, 0)
             if item is not None:  # Check if item exists
-                selected_instructions.append(item.text())
+                selected_instructions.append(self.normalize_instruction(item.text()))
 
         status = self.status_combobox.currentText()
 
@@ -105,23 +103,29 @@ class CustomBreakPointPlugin(idaapi.PluginForm):
 
                 for head in idautils.Heads(func_ea, func_end):
                     if idc.is_code(idc.get_full_flags(head)):
+                        full_instruction = self.normalize_instruction(idc.generate_disasm_line(head, 0))  # Get the normalized full instruction
 
-                        if idc.print_insn_mnem(head) in selected_instructions:
-                            idaapi.add_bpt(head)
-                            
-                            msg = ""
+                        for pattern in selected_instructions:
+                            if re.search(pattern, full_instruction):  # Use regex search on normalized strings
+                                idaapi.add_bpt(head)
+                                
+                                msg = ""
 
-                            if status == "Disable":
-                                idaapi.disable_bpt(head)
-                                msg = "Disabled"
-                            elif status == "Enable":
-                                idaapi.enable_bpt(head)
-                                msg = "Enabled"
-                            elif status == "Remove Breakpoints":
-                                idaapi.del_bpt(head)
-                                msg = "Removed"
-                            print(f"[CBS] ({msg}) breakpoint -> {hex(head)}: {idc.print_insn_mnem(head)}")
-        
+                                if status == "Disable":
+                                    idaapi.disable_bpt(head)
+                                    msg = "Disabled"
+                                elif status == "Enable":
+                                    idaapi.enable_bpt(head)
+                                    msg = "Enabled"
+                                elif status == "Remove Breakpoints":
+                                    idaapi.del_bpt(head)
+                                    msg = "Removed"
+                                print(f"[CBS] ({msg}) breakpoint -> {hex(head)}: {full_instruction}")
+
+    def normalize_instruction(self, instruction):
+        """Normalize instruction string by removing extra spaces, commas, and semicolons."""
+        return re.sub(r'\s+', ' ', instruction.replace(',', '').replace(';', '')).strip()
+
     def OnClose(self, form):
         pass
 
