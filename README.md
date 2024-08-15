@@ -1,13 +1,20 @@
 # Custom Breakpoint Setter
-This is an IDA Plugin powered by Python that sets a disabled breakpoint on specific instruction's mnemonic.
+This is a Python-powered IDA Pro plugin designed to set breakpoints on specific instructions. The plugin leverages regular expressions (regex) to efficiently locate and manage the instructions you want to target.
+
 
 ![](docs/media/CBS-Plugin.png)
 
+
+
 ## Installation
 
-Just copy the python script into `$ida_path/plugins/` and restart your IDA.
+This plugin is intended for use with IDA Pro, which utilizes Python as a plugin and scripting engine. To install, simply copy the Python script into the $ida_path/plugins/ directory, then restart IDA Pro.
+
+
+## Todo
+
+- [X] Add regex engine to find instructions better.
+- [ ] Add import and export ability for instructions.
 
 
 ## Demo
-
-[demo.webm](https://github.com/Reodus/CBS/assets/161498863/d9da43ee-36a5-45d3-8f9a-eec69ff4f603)
