@@ -18,3 +18,6 @@ This plugin is intended for use with IDA Pro, which utilizes Python as a plugin 
 
 
 ## Demo
+
+https://github.com/user-attachments/assets/8de6f87d-e111-400d-bb21-47d060e40ba4
+
